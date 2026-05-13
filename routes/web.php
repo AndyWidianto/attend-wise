@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\HistoryController;
+use App\Http\Controllers\AttendenceClockController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\absensi;
-use App\Http\Controllers\login;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,21 +17,18 @@ use App\Http\Controllers\login;
 |
 */
 
-/* route absensi*/
-route::middleware(['auth'])->group(function(){
-    route::get('/dashboard-{id}',[absensi::class,'index'])->name('dasboard');
-    route::get('/{id}/create-absensi-Karyawan',[absensi::class,'create'])->name('create');
-    route::post('/prosess-absensi-karyawan/{id}',[absensi::class,'store'])->name('store');
-    route::get('/{name}/edit-absensi-karyawan-{id}',[absensi::class,'edit'])->name('edit');
-    route::PUT('/{name}/update-absensi-karyawan-{id}',[absensi::class,'update'])->name('update');
-    route::post('/{name}/prosessing-delete-{id}',[absensi::class,'delete'])->name('delete');
-    route::get('{name}/show-absensi-karyawan-{id}',[absensi::class,'show'])->name('show');
+Route::get('/', function () {
+    // return redirect("/dashboard");
 });
 
+Route::get('/dashboard', [DashboardController::class, "index"])->middleware(['auth', 'verified'])->name('dashboard');
 
-/* route login*/
-route::get('/',[login::class,'login'])->name('login');
-route::get('/signin',[login::class,'signin'])->name('signin');
-route::PUT('/inputsignin',[login::class,'inputsignin'])->name('inputsignin');
-route::post('/login_proses',[login::class,'login_proses'])->name('login_proses');
-route::get('/logout',[login::class,'akunlogout'])->name('logout');
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard/history', [HistoryController::class, 'index'])->name('history');
+    Route::get('/dashboard/clock', [AttendenceClockController::class, 'index'])->name('attendanceClock');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+require __DIR__.'/auth.php';
